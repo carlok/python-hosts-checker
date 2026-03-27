@@ -1,0 +1,17 @@
+# Local development only — not used by AWS.
+services:
+  checker:
+    build: .
+    command: python /app/checker.py
+
+    env_file:
+      - .env.local
+
+    environment:
+      EVENT_JSON: ""
+
+    volumes:
+      - ./checker.py:/app/checker.py:ro
+      - ./hosts_lambda_checker.local.json:/app/hosts_lambda_checker.local.json:ro
+      - ./hosts_lambda_checker.json:/app/hosts_lambda_checker.json:ro
+

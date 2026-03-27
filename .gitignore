@@ -1,0 +1,17 @@
+.env
+.env.local
+.env.*.local
+
+hosts_lambda_checker.local.json
+*.local.json
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.DS_Store

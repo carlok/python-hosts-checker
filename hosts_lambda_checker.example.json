@@ -1,0 +1,43 @@
+{
+  "authenticated": [
+    {
+      "domain": "private.example.com",
+      "port": 443,
+      "protocol": "https",
+      "verb": "GET",
+      "username": "monitor_user",
+      "password": "change_me"
+    }
+  ],
+  "unauthenticated": [
+    {
+      "domain": "example.com",
+      "port": 443,
+      "protocol": "https",
+      "verb": "HEAD",
+      "follow_redirects": true,
+      "suffix": "/health",
+      "expected_status": [
+        200
+      ]
+    },
+    {
+      "domain": "example.com",
+      "port": 80,
+      "protocol": "http",
+      "verb": "HEAD",
+      "follow_redirects": false
+    },
+    {
+      "domain": "app.example.com",
+      "port": 443,
+      "protocol": "https",
+      "verb": "GET",
+      "suffix": "/login",
+      "headers": {
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (compatible; monitor/1.0)"
+      }
+    }
+  ]
+}

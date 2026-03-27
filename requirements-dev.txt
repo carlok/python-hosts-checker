@@ -1,0 +1,2 @@
+urllib3>=2.0
+python-dotenv          # local __main__ only; not imported in lambda_handler
