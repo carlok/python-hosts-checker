@@ -157,7 +157,8 @@ EVENT_JSON='{"unauthenticated":[{"domain":"example.com","port":443,"protocol":"h
 1. `EVENT_JSON` environment variable
 2. CLI argument: `python checker.py path/to/file.json`
 3. `config.json` if it exists in the working directory
-4. `hosts_lambda_checker.json` (default)
+4. `hosts_lambda_checker.local.json` (local-private default)
+5. `hosts_lambda_checker.example.json` (safe fallback template)
 
 ---
 

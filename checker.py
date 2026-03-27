@@ -281,8 +281,10 @@ if __name__ == "__main__":
             config_file = sys.argv[1]
         elif os.path.exists('config.json'):
             config_file = 'config.json'
+        elif os.path.exists('hosts_lambda_checker.local.json'):
+            config_file = 'hosts_lambda_checker.local.json'
         else:
-            config_file = 'hosts_lambda_checker.json'
+            config_file = 'hosts_lambda_checker.example.json'
 
         log.info(f"loading event from file: {config_file}")
         try:
