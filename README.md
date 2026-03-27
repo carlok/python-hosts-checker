@@ -122,6 +122,18 @@ To rebuild after changing `requirements-dev.txt`:
 docker compose up --build
 ```
 
+### Install local git safety hooks
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+pre-commit install
+```
+
+The repository includes a `detect-secrets` pre-commit hook configured with
+`.secrets.baseline` to block newly introduced secrets in tracked files.
+
 ### Pass a different config file
 
 ```bash
@@ -154,12 +166,14 @@ EVENT_JSON='{"unauthenticated":[{"domain":"example.com","port":443,"protocol":"h
 ```
 checker.py                        # Lambda handler + local entrypoint
 requirements.txt                  # Lambda dependencies (urllib3 only)
-requirements-dev.txt              # Local dev dependencies (adds python-dotenv)
+requirements-dev.txt              # Local dev deps (dotenv, pre-commit, detect-secrets)
 Dockerfile                        # Local dev image — installs deps only, no code
 docker-compose.yml                # Local dev runner — mounts code and config
 hosts_lambda_checker.example.json # Example event/config file
 hosts_lambda_checker.local.json   # Local-private runtime config (git-ignored)
 .env.example                      # Example env file for local runs
+.pre-commit-config.yaml           # Local commit hooks (format + secret scan)
+.secrets.baseline                 # Secret scan baseline for tracked files
 ```
 
 ## Security and publishing

@@ -14,4 +14,3 @@ services:
       - ./checker.py:/app/checker.py:ro
       - ./hosts_lambda_checker.local.json:/app/hosts_lambda_checker.local.json:ro
       - ./hosts_lambda_checker.json:/app/hosts_lambda_checker.json:ro
-
