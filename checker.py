@@ -81,7 +81,7 @@ def certificate_remote_expire_get(hostname, port):
     log.debug(f"  cert  connecting to {hostname}:{port} for TLS handshake")
     context = ssl.create_default_context()
     try:
-        with socket.create_connection((hostname, port)) as sock:
+        with socket.create_connection((hostname, port), timeout=10.0) as sock:
             with context.wrap_socket(sock, server_hostname=hostname) as ssock:
                 cert = ssock.getpeercert()
 
@@ -98,12 +98,14 @@ def certificate_remote_expire_get(hostname, port):
 
     except Exception as e:
         log.error(f"  cert  check failed for {hostname}: {type(e).__name__}: {e}")
-        return 100
+        return None
 
 
 def certificate_remote_expire_check(vhost):
     days = certificate_remote_expire_get(vhost['domain'], vhost['port'])
-    if days <= 7:
+    if days is None:
+        _alert(vhost, 'certificate check failed (connection error)')
+    elif days <= 7:
         _alert(vhost, f'certificate expires in {days} days')
     else:
         log.info(f"  cert  ✓ {vhost['domain']} — {days} days left")
