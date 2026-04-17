@@ -61,6 +61,7 @@ Alerts are sent to a Telegram chat via bot.
 | `suffix` | | — | URL path appended after domain |
 | `expected_status` | | `[200]` | List of HTTP status codes considered OK |
 | `headers` | | `{}` | Extra request headers (merged over defaults, useful for SPAs that check `Accept` or `User-Agent`) |
+| `cert_warning_days` | | `7` | Alert when the SSL certificate expires within this many days |
 | `username` | authenticated only | — | Basic auth username |
 | `password` | authenticated only | — | Basic auth password |
 

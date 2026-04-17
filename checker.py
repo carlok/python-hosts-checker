@@ -103,9 +103,10 @@ def certificate_remote_expire_get(hostname, port):
 
 def certificate_remote_expire_check(vhost):
     days = certificate_remote_expire_get(vhost['domain'], vhost['port'])
+    warn_days = vhost.get('cert_warning_days', 7)
     if days is None:
         _alert(vhost, 'certificate check failed (connection error)')
-    elif days <= 7:
+    elif days <= warn_days:
         _alert(vhost, f'certificate expires in {days} days')
     else:
         log.info(f"  cert  ✓ {vhost['domain']} — {days} days left")
