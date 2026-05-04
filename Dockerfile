@@ -4,3 +4,8 @@ WORKDIR /app
 
 COPY requirements-dev.txt .
 RUN pip install --no-cache-dir -r requirements-dev.txt
+
+# App source and tests (build fails if tests or coverage gate fail)
+COPY checker.py pytest.ini ./
+COPY tests ./tests
+RUN pytest

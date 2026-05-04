@@ -85,11 +85,13 @@ Only `urllib3>=2.0` — no other runtime dependency.
 
 ---
 
-## Local development
+## Local development (Podman-first)
+
+This repo’s dev workflow targets **Podman**. The same OCI image builds with `Dockerfile` or `Containerfile` (symlink); `podman compose` reads `docker-compose.yml` as usual.
 
 ### Prerequisites
 
-- Docker + Docker Compose
+- **Podman** and the **Compose** integration (`podman compose`, often via the `compose` subcommand or `podman-compose` depending on your install)
 - A copy of the hosts config JSON
 
 ### Setup
@@ -108,18 +110,35 @@ cp .env.example .env.local
 # hosts_lambda_checker.local.json
 ```
 
+### Build the dev image (runs unit tests + coverage in the build)
+
+```bash
+podman compose build
+```
+
+The image build runs `pytest` with coverage; a failing test or install error fails the build.
+
 ### Run
 
 ```bash
-docker compose run checker python /app/checker.py /app/hosts_lambda_checker.local.json
+podman compose run checker python /app/checker.py /app/hosts_lambda_checker.local.json
 ```
 
-`checker.py` is mounted as a volume for local development.
+`checker.py` is mounted as a volume for local development. After editing code, rebuild to re-run the image build tests, or run tests locally (below).
 
 To rebuild after changing `requirements-dev.txt`:
 
 ```bash
-docker compose up --build
+podman compose build
+```
+
+### Run tests locally (without building the image)
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements-dev.txt
+pytest
 ```
 
 ### Install local git safety hooks
@@ -137,7 +156,7 @@ The repository includes a `detect-secrets` pre-commit hook configured with
 ### Pass a different config file
 
 ```bash
-docker compose run checker python /app/checker.py /app/other_hosts.json
+podman compose run checker python /app/checker.py /app/other_hosts.json
 ```
 
 Mount the extra file first if it lives outside the project directory, or add it
@@ -147,7 +166,7 @@ to the volumes list in `docker-compose.yml`.
 
 ```bash
 EVENT_JSON='{"unauthenticated":[{"domain":"example.com","port":443,"protocol":"https","verb":"HEAD"}]}' \
-  docker compose up
+  podman compose up
 ```
 
 `EVENT_JSON` takes priority over the config file when set and non-empty.
@@ -160,6 +179,23 @@ EVENT_JSON='{"unauthenticated":[{"domain":"example.com","port":443,"protocol":"h
 4. `hosts_lambda_checker.local.json` (local-private default)
 5. `hosts_lambda_checker.example.json` (safe fallback template)
 
+### Rootless Podman (Linux)
+
+If bind mounts fail with permission errors, you may need volume relabelling (e.g. `:Z` on the mount) for your environment.
+
+---
+
+## Docker / Docker Compose (optional)
+
+If you use Docker instead of Podman, the same commands work with `docker` / `docker compose`:
+
+- `docker compose build` — builds the image (includes tests in the build)
+- `docker compose run checker ...` — same as the Podman examples above
+
+Building the image directly:
+
+- `podman build -f Dockerfile .` or `podman build -f Containerfile .` (equivalent)
+
 ---
 
 ## Project structure
@@ -167,8 +203,11 @@ EVENT_JSON='{"unauthenticated":[{"domain":"example.com","port":443,"protocol":"h
 ```
 checker.py                        # Lambda handler + local entrypoint
 requirements.txt                  # Lambda dependencies (urllib3 only)
-requirements-dev.txt              # Local dev deps (dotenv, pre-commit, detect-secrets)
-Dockerfile                        # Local dev image — installs deps only, no code
+requirements-dev.txt              # Local dev deps (dotenv, pre-commit, pytest, …)
+pytest.ini                        # Pytest + coverage defaults
+tests/                            # Unit tests (mocked I/O)
+Dockerfile                        # Dev image; RUN pytest during build
+Containerfile                     # Symlink to Dockerfile (Podman-friendly name)
 docker-compose.yml                # Local dev runner — mounts code and config
 hosts_lambda_checker.example.json # Example event/config file
 hosts_lambda_checker.local.json   # Local-private runtime config (git-ignored)
