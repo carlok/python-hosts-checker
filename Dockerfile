@@ -1,7 +1,4 @@
-# Same instructions as Dockerfile; duplicate for Podman/Buildah (`podman build -f Containerfile`).
-# When changing build steps, update both files (no symlink).
-
-# Containerfile mirrors these steps for Podman; keep both in sync.
+# Dev image: install dev deps, copy app + tests; build fails if pytest fails.
 FROM python:3.14-slim
 
 WORKDIR /app
