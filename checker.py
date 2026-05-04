@@ -74,6 +74,23 @@ def string_to_datetime(string):
 
 
 # ---------------------------------------------------------------------------
+# URL building
+# ---------------------------------------------------------------------------
+
+def build_request_url(vhost):
+    """Build scheme://host[:port][/suffix] matching the host checked for TLS/HTTP."""
+    url = f"{vhost['protocol']}://{vhost['domain']}"
+    if vhost['port'] not in (80, 443):
+        url = f"{url}:{vhost['port']}"
+    if vhost.get('suffix'):
+        suffix = vhost['suffix']
+        if not suffix.startswith('/'):
+            suffix = '/' + suffix
+        url = f"{url}{suffix}"
+    return url
+
+
+# ---------------------------------------------------------------------------
 # Certificate check
 # ---------------------------------------------------------------------------
 
@@ -106,7 +123,10 @@ def certificate_remote_expire_check(vhost):
     if days is None:
         _alert(vhost, 'certificate check failed (connection error)')
     elif days <= 7:
-        _alert(vhost, f'certificate expires in {days} days')
+        if days < 0:
+            _alert(vhost, f'certificate expired {-days} days ago')
+        else:
+            _alert(vhost, f'certificate expires in {days} days')
     else:
         log.info(f"  cert  ✓ {vhost['domain']} — {days} days left")
 
@@ -203,14 +223,7 @@ def perform_request(vhost, method, url, headers=None):
 # ---------------------------------------------------------------------------
 
 def vhost_https_check_unauthenticated(vhost):
-    url = f"{vhost['protocol']}://{vhost['domain']}"
-    if vhost['port'] not in [80, 443]:
-        url = f"{url}:{vhost['port']}"
-    if vhost.get('suffix'):
-        suffix = vhost['suffix']
-        if not suffix.startswith('/'):
-            suffix = '/' + suffix
-        url = f"{url}{suffix}"
+    url = build_request_url(vhost)
 
     verb = vhost.get('verb', 'HEAD')
     perform_request(vhost, verb, url)
@@ -220,7 +233,7 @@ def vhost_https_get_authenticated(vhost):
     headers = urllib3.make_headers(
         basic_auth='{}:{}'.format(vhost['username'], vhost['password'])
     )
-    url = f"{vhost['protocol']}://{vhost['domain']}"
+    url = build_request_url(vhost)
     verb = vhost.get('verb', 'HEAD')
     perform_request(vhost, verb, url, headers=headers)
 
