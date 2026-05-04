@@ -87,7 +87,7 @@ Only `urllib3>=2.0` — no other runtime dependency.
 
 ## Local development (Podman-first)
 
-This repo’s dev workflow targets **Podman**. The same OCI image builds with `Dockerfile` or `Containerfile` (symlink); `podman compose` reads `docker-compose.yml` as usual.
+This repo’s dev workflow targets **Podman**. The same OCI image builds with `Dockerfile` or `Containerfile` (duplicate content; keep both in sync); `podman compose` reads `docker-compose.yml` as usual.
 
 ### Prerequisites
 
@@ -207,7 +207,7 @@ requirements-dev.txt              # Local dev deps (dotenv, pre-commit, pytest, 
 pytest.ini                        # Pytest + coverage defaults
 tests/                            # Unit tests (mocked I/O)
 Dockerfile                        # Dev image; RUN pytest during build
-Containerfile                     # Symlink to Dockerfile (Podman-friendly name)
+Containerfile                     # Same as Dockerfile (Podman-friendly name)
 docker-compose.yml                # Local dev runner — mounts code and config
 hosts_lambda_checker.example.json # Example event/config file
 hosts_lambda_checker.local.json   # Local-private runtime config (git-ignored)
