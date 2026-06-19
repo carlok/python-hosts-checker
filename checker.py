@@ -80,7 +80,11 @@ def string_to_datetime(string):
 def build_request_url(vhost):
     """Build scheme://host[:port][/suffix] matching the host checked for TLS/HTTP."""
     url = f"{vhost['protocol']}://{vhost['domain']}"
-    if vhost['port'] not in (80, 443):
+    default_ports = {
+        'http': 80,
+        'https': 443,
+    }
+    if vhost['port'] != default_ports.get(vhost['protocol']):
         url = f"{url}:{vhost['port']}"
     if vhost.get('suffix'):
         suffix = vhost['suffix']

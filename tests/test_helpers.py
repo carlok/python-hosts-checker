@@ -31,6 +31,14 @@ def test_string_to_datetime_gmt():
             "https://a.com:8443",
         ),
         (
+            {"protocol": "http", "domain": "a.com", "port": 443},
+            "http://a.com:443",
+        ),
+        (
+            {"protocol": "https", "domain": "a.com", "port": 80},
+            "https://a.com:80",
+        ),
+        (
             {
                 "protocol": "https",
                 "domain": "a.com",
