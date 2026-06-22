@@ -52,3 +52,16 @@ def test_perform_request_exception_alerts():
         with patch.object(checker, "_alert") as alert:
             checker.perform_request(vhost, "HEAD", "https://example.com")
     alert.assert_called_once()
+
+
+def test_telegram_send_uses_configured_api_prefix(monkeypatch):
+    monkeypatch.setenv("BOT_TOKEN", "token")
+    monkeypatch.setenv("BOT_API_PREFIX", "https://telegram.test/bot/")
+
+    with patch.object(checker.http, "request") as req:
+        checker._telegram_send("hello world", "chat-id")
+
+    req.assert_called_once_with(
+        "GET",
+        "https://telegram.test/bottoken/sendMessage?chat_id=chat-id&text=hello%20world",
+    )
