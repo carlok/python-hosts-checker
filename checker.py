@@ -148,8 +148,9 @@ def _alert(vhost, error_code):
 
 def _telegram_send(bot_message, bot_chatID):
     bot_token = os.environ.get("BOT_TOKEN", "dummy_token")
+    bot_api_prefix = os.environ.get("BOT_API_PREFIX", "https://api.telegram.org/bot").rstrip("/")
     send_text = (
-        'https://api.telegram.org/bot' + bot_token +
+        bot_api_prefix + bot_token +
         '/sendMessage?chat_id=' + str(bot_chatID) +
         '&text=' + quote(bot_message)
     )
