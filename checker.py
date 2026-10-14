@@ -101,6 +101,7 @@ def build_request_url(vhost):
 def certificate_remote_expire_get(hostname, port):
     log.debug(f"  cert  connecting to {hostname}:{port} for TLS handshake")
     context = ssl.create_default_context()
+    context.minimum_version = ssl.TLSVersion.TLSv1_2
     try:
         with socket.create_connection((hostname, port), timeout=10.0) as sock:
             with context.wrap_socket(sock, server_hostname=hostname) as ssock:
