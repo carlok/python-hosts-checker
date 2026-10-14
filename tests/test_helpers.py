@@ -60,3 +60,27 @@ def test_string_to_datetime_gmt():
 )
 def test_build_request_url(vhost, expected):
     assert checker.build_request_url(vhost) == expected
+
+
+def test_certificate_check_requires_tls12(monkeypatch):
+    contexts = []
+
+    class _StopHandshake(Exception):
+        pass
+
+    def fake_wrap_socket(self, sock, server_hostname=None):
+        contexts.append(self)
+        raise _StopHandshake
+
+    class _FakeSock:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+    monkeypatch.setattr(checker.socket, "create_connection", lambda *a, **k: _FakeSock())
+    monkeypatch.setattr(checker.ssl.SSLContext, "wrap_socket", fake_wrap_socket)
+
+    assert checker.certificate_remote_expire_get("a.com", 443) is None
+    assert contexts[0].minimum_version == checker.ssl.TLSVersion.TLSv1_2
